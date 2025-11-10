@@ -1,5 +1,5 @@
-import LogoBlack from "./assets/Logo_black.svg";
-import Send from "./assets/Send.svg";
+import LogoBlack from "../assets/Logo_black.svg";
+import Send from "../assets/Send.svg";
 import SuggestionCard from "../components/SuggestionCard";
 
 const AIChatBot = () => {
@@ -19,12 +19,12 @@ const AIChatBot = () => {
             Ask our AI anything
           </h1>
         </div>
-        <div className="mx-auto mb-9 w-full max-w-xl md:max-w-[883px]">
+        <div className="mx-5 mb-9 w-full px-4 sm:mx-10 md:mx-auto md:max-w-[899px]">
           <div className="space-y-5">
             <h2 className="leading-tight font-medium tracking-tight text-[#56637E]">
               Suggestions on what to ask Our AI
             </h2>
-            <div>
+            <div className="grid w-full grid-cols-1 gap-3.5 sm:grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
               <SuggestionCard text="What can I ask you to do?" />
               <SuggestionCard text="Which one of my projects is performing the best?" />
               <SuggestionCard text="What projects should I be concerned about right now?" />
@@ -33,12 +33,12 @@ const AIChatBot = () => {
           <form
             action=""
             onSubmit={() => console.log("submitted")}
-            className="mt-[38px] flex h-14 items-center justify-between rounded-lg border border-[#160211]/30 bg-white p-[9px] transition-shadow delay-75 duration-75 ease-in-out focus-within:shadow-lg"
+            className="mt-[38px] flex h-14 items-center justify-between rounded-lg border border-[#160211]/30 bg-white p-[9px] transition-shadow duration-100 ease-in-out focus-within:shadow-lg"
           >
             <input
               type="text"
               className="w-full text-[14px] leading-tight font-normal tracking-tight text-black outline-none placeholder:text-[#A0AEC0]"
-              placeholder="Ask me anything! Your smart AI assistant is ready to help."
+              placeholder="Ask me anything!"
             />
             <button type="submit">
               <img src={Send} alt="Send Icon" className="w-9" />

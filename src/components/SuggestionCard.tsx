@@ -6,7 +6,7 @@ type SuggestionProp = {
 
 const SuggestionCard: React.FC<SuggestionProp> = ({ text }) => {
   return (
-    <div className="w-[294px] rounded-lg border border-white bg-white/50 p-[9px] text-[#160211]">
+    <div className="h-min w-full rounded-lg border border-white bg-white/50 p-[9px] text-[#160211]">
       {text}
     </div>
   );
