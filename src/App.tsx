@@ -1,7 +1,8 @@
 import "./App.css";
+import AIChatBot from "./pages/AIChatBot";
 
 function App() {
-  return <div className="">Hello World!</div>;
+  return <AIChatBot />;
 }
 
 export default App;
