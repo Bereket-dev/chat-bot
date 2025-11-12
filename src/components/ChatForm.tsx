@@ -1,24 +1,45 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import Send from "../assets/Send.svg";
 import type { ChatFormProps } from "../types";
 
-const ChatForm: React.FC<ChatFormProps> = ({ setChatHistory }) => {
+const ChatForm: React.FC<ChatFormProps> = ({
+  setChatHistory,
+  generateBotResponse,
+  isLoading
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Focus on input when component mounts
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+  
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => 
     {
       e.preventDefault();
       const userMessage = inputRef.current?.value.trim();
       if (!userMessage) return;
       if (inputRef.current) inputRef.current.value = "";
 
+      isLoading = true;
       //update chat history with new user message
       setChatHistory((history) => [
         ...history,
         { role: "user", text: userMessage },
       ]);
+
+      setTimeout(() => {
+        setChatHistory((history) => {
+          const updated = [...history, { role: "model", text: "" }];
+          
+          generateBotResponse(updated);
+
+          return updated;
+        });
+      }, 600);
     }
-  };
+  
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -29,8 +50,9 @@ const ChatForm: React.FC<ChatFormProps> = ({ setChatHistory }) => {
         ref={inputRef}
         className="w-full text-[14px] leading-tight font-normal tracking-tight text-black outline-none placeholder:text-[#A0AEC0]"
         placeholder="Ask me anything!"
+
       />
-      <button type="submit">
+      <button type="submit" disabled={isLoading}>
         <img src={Send} alt="Send Icon" className="w-9" />
       </button>
     </form>
