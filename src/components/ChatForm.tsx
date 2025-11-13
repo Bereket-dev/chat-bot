@@ -43,17 +43,17 @@ const ChatForm: React.FC<ChatFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex h-14 items-center justify-between rounded-lg border border-[#160211]/30 bg-white p-[9px] transition-shadow duration-100 ease-in-out focus-within:shadow-lg dark:bg-black"
+      className="flex h-10 sm:h-12 md:h-14 w-full items-center dark:border-white/20 justify-between rounded-2xl dark:shadow-gray-900/20 dark:shadow-sm border border-[#160211]/30 bg-white p-[9px] transition-shadow duration-100 ease-in-out focus-within:shadow-lg dark:bg-black"
     >
       <input
         type="text"
         ref={inputRef}
-        className="w-full text-[14px] leading-tight font-normal tracking-tight text-black outline-none placeholder:text-[#A0AEC0]"
+        className="w-full text-[14px] leading-tight font-normal tracking-tight text-black  dark:text-white outline-none placeholder:text-[#A0AEC0]"
         placeholder="Ask me anything!"
 
       />
       <button type="submit" disabled={isLoading}>
-        <img src={Send} alt="Send Icon" className="w-9" />
+        <img src={Send} alt="Send Icon" className="sm:w-7 w-5 md:w-9" />
       </button>
     </form>
   );

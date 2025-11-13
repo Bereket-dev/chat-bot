@@ -14,51 +14,54 @@ import generateResponse from "../utils/generateResponse";
 const AIChatBot = () => {
   const { isDark } = useToggleObserver();
   const [chatHistory, setChatHistory] = useState<ChatMessageProps[]>([]);
-  const [isLoading, setIsLoading]=useState<boolean>(false);
-   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   // Scroll to bottom whenever chatHistory changes
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-  let message:string[] = [];
-  const generateBotResponse = async(history:ChatMessageProps[]) => {
+  let message: string[] = [];
+  const generateBotResponse = async (history: ChatMessageProps[]) => {
     try {
-    setIsLoading(true);
+      setIsLoading(true);
 
-    const enhancedPrompt = getRandomPrompt(history[history.length - 2].text);
-    message.push(enhancedPrompt);
+      const enhancedPrompt = getRandomPrompt(history[history.length - 2].text);
+      message.push(enhancedPrompt);
 
-    const response:string = await generateResponse(message);
-    setChatHistory(prev => {
-  if (prev.length === 0) return prev; // nothing to update
+      const response: string = await generateResponse(message);
+      setChatHistory(prev => {
+        if (prev.length === 0) return prev; // nothing to update
 
-  const updated = [...prev];
-  updated[updated.length - 1] = { ...updated[updated.length - 1], text: response };
-  return updated;
-});
-
-      } catch (error) {
-       console.error('Error generating bot response:', error);
-    } finally{
+        const updated = [...prev];
+        updated[updated.length - 1] = { ...updated[updated.length - 1], text: response };
+        return updated;
+      });
+    } catch (error) {
+      console.error('Error generating bot response:', error);
+    } finally {
       setIsLoading(false)
     }
   };
-  
+
+
   return (
-    <div className="relative min-h-screen h-fit max-w-screen overflow-hidden bg-white dark:bg-black">
+    <div className="relative min-h-screen overflow-hidden max-w-screen bg-white dark:bg-gradient-to-br dark:from-[#0f0f0f] dark:via-[#1a1a1a] dark:to-[#000000]">
       {/* Dark mode toggle */}
-      <div className="absolute top-10 right-10 z-10">
+      <div className="fixed top-10 right-10 z-10">
         <ThemeToggle />
       </div>
-      {/* Main glowing gradient */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -bottom-30 left-[44%] h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-[#FF86E1] blur-[200px] md:h-[414px] md:w-[414px]"></div>
 
-        <div className="absolute bottom-30 left-[50%] h-[200px] w-[200px] rounded-full bg-[#89BCFF] blur-[200px] md:h-[280px] md:w-[280px]"></div>
+      {/* Main glowing gradient */}
+      <div className="pointer-events-none fixed inset-0">
+        <div className="fixed -bottom-30 left-[44%] h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-[#FF86E1] dark:bg-black blur-[200px] md:h-[414px] md:w-[414px]"></div>
+
+        <div className="fixed bottom-30 left-[50%] h-[200px] w-[200px] rounded-full bg-[#89BCFF] dark:bg-black blur-[200px] md:h-[280px] md:w-[280px]"></div>
       </div>
-      <div className="relative flex min-h-[calc(100vh-100px)] flex-col items-center justify-between px-4 md:mx-auto md:max-w-[899px]">
+
+      <div className="relative flex flex-col items-center justify-between min-h-[calc(100vh-100px)] mb-24 
+  w-[90vw] max-w-[900px] mx-auto px-5 sm:px-10">
         {/* Your Chatbot content */}
         <div className="mx-auto mt-20 flex flex-col items-center gap-12 text-black">
           <img
@@ -66,17 +69,19 @@ const AIChatBot = () => {
             alt="AI icon"
             className="w-9"
           />
-          <h1 className="mb-[50px] text-[21px] leading-tight font-normal tracking-tight dark:text-white">
+          <h1 className="mb-[50px] text-lg sm:text-xl lg:text-2xl md:text-3xl leading-tight font-normal tracking-tight dark:text-white">
             Ask our AI anything
           </h1>
         </div>
-        <div className="mx-5 w-full px-4 sm:mx-10 md:mx-auto md:max-w-[899px]">
+
+        <div className="w-full">
           {chatHistory.length > 0 ? (
-            <div className="space-y-3">
+            <div className="flex flex-col space-y-3">
               {chatHistory.map((chat, index) => (
                 <div
                   key={index}
-                  className={`flex ${chat.role == "model" ? "justify-end" : "justify-start"}`}
+                  className={`flex ${chat.role === "model" ? "justify-start" : "justify-end"
+                    }`}
                 >
                   <MessageCard text={chat.text} role={chat.role} />
                 </div>
@@ -103,18 +108,19 @@ const AIChatBot = () => {
               )}
             </>
           )}
-      </div>
         </div>
-<div className="fixed z-10 bottom-5 left-1/2 -translate-x-1/2 
-                w-[90vw] max-w-[600px] sm:max-w-[700px] md:max-w-[899px]">
-            <ChatForm
-              setChatHistory={setChatHistory}
-              generateBotResponse={generateBotResponse}
-              isLoading = {isLoading}
-            />
-          </div>
-           {/* Invisible div to scroll into view */}
-      <div className="" ref={bottomRef} />
+      </div>
+
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-10 
+  w-[90vw] max-w-[700px] px-7 sm:px-12">
+        <ChatForm
+          setChatHistory={setChatHistory}
+          generateBotResponse={generateBotResponse}
+          isLoading={isLoading}
+        />
+      </div>
+      {/* Invisible div to scroll into view */}
+      <div ref={bottomRef} />
     </div>
   );
 };

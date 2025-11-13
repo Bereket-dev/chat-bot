@@ -24,7 +24,7 @@ const SuggestionCard: React.FC<SuggestionProps> = ({
   return (
     <div
       onClick={handleSuggestion}
-      className={`rounded-lg border border-white bg-white/30 p-[9px] text-[#160211]`}
+      className={`rounded-lg border border-white bg-white/45 p-[9px] text-[#160211] dark:bg-black/30 dark:border-white/20 dark:text-white`}
     >
       {text}
     </div>
