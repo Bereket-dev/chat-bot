@@ -17,7 +17,7 @@ const MessageCard: React.FC<ChatMessageProps> = ({ text, role }) => {
       {/* Message bubble */}
       <div
         className={`flex items-center gap-3 rounded-lg border border-white  p-3 text-[#160211] dark:text-white
-          ${isModel ? "bg-white/95 dark:bg-gray-300/10 rounded-tl-sm  text-start dark:border-none" : "bg-white/45 dark:bg-black/30  text-end dark:border-white/20 rounded-tr-none"} 
+          ${isModel ? "bg-white/95 dark:bg-gray-300/10 rounded-tl-sm  text-start dark:border-none" : "bg-white/45 dark:bg-black/30  text-end dark:border-white/20 rounded-tr-sm"} 
           ${isLoading && "animate-pulse"}
          text-sm md:text-base`}
       >

@@ -8,7 +8,7 @@ import ChatForm from "../components/ChatForm";
 import type { ChatMessageProps } from "../types";
 import MessageCard from "../components/MessageCard";
 import { suggestedQueries } from "../utils/getSuggestions";
-import getRandomPrompt from "../utils/getRandomPrompt";
+// import getRandomPrompt from "../utils/getRandomPrompt";
 import generateResponse from "../utils/generateResponse";
 
 const AIChatBot = () => {
@@ -17,34 +17,90 @@ const AIChatBot = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  // Scroll to bottom whenever chatHistory changes
+  // Auto scroll when new messages appear
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-  let message: string[] = [];
+  const [questionCount, setQuestionCount] = useState<number>(0); // track questions
+  const [isGuessing, setIsGuessing] = useState<boolean>(true); // only guess when true
+
+
   const generateBotResponse = async (history: ChatMessageProps[]) => {
     try {
       setIsLoading(true);
 
-      const enhancedPrompt = getRandomPrompt(history[history.length - 2].text);
-      message.push(enhancedPrompt);
+      const userLastMessage = history[history.length - 2]?.text ?? "";
+      const newQuestionCount = questionCount + 1;
 
-      const response: string = await generateResponse(message);
+      
+      if (userLastMessage.includes("guess")) {
+        setQuestionCount(1);
+        setIsGuessing(true)
+      }  
+      
+      // Decide if AI should guess or ask a new question
+      const shouldGuess = newQuestionCount > 4;
+
+      const enhancedPrompt = `
+You are an AI chatbot whose goal is to guess the user's AGE RANGE.
+
+Rules:
+1. Ask **up to 4 short, direct questions** about hobbies, interests, or personality to guess the age.
+2. Each question: 1 sentence, ≤50 characters.
+3. After 4 questions OR if confident, output the **age range**.
+4. **Immediately after the age range**, always provide a short, funny/humorous argument explaining why you guessed that age.
+5. Then provide a brief, witty comment about the user's last message.
+6. Never repeat questions or ask personal info (name, location, income, ID).
+7. Keep everything playful, short, and structured: 
+   - Question(s) → Age guess → Funny argument → Witty reply.
+8. Don't use guess keyword in normal conversation use it only to initialize the guess agin.
+
+Decide whether to ask or guess:
+
+${isGuessing && questionCount >= 4
+          ? "Stop asking. Make your age guess now and always include the funny reasoning and a witty reply."
+          : "Ask 1 short question to get closer to guessing the age."
+        }}
+
+User said:
+"${userLastMessage}"
+${isGuessing ? "" : "Do NOT guess; explain or comment only. If the user ask the reason but your need to argue strongly not the source in clear and funny way. If they want to guess again let give the keyword in the response in normal way like let's guess again or including guess keyword."}
+`;
+
+      const messages: string[] = [enhancedPrompt];
+      const response: string = await generateResponse(messages);
+
+      // Append bot response
       setChatHistory(prev => {
-        if (prev.length === 0) return prev; // nothing to update
+        if (prev.length === 0) return prev;
 
         const updated = [...prev];
-        updated[updated.length - 1] = { ...updated[updated.length - 1], text: response };
+        const last = updated[updated.length - 1];
+        updated[updated.length - 1] = {
+          ...last,
+          text: (last.text ?? "") + response
+        };
         return updated;
       });
+
+      if (response.includes("Age Range:") || response.match(/\d{1,2}-\d{1,2}/)) {
+        setIsGuessing(false);
+        setQuestionCount(0);
+      }
+
+
+      // Update question count only if AI actually asked a question
+      if (!shouldGuess) {
+        setQuestionCount(newQuestionCount);
+      }
+
     } catch (error) {
-      console.error('Error generating bot response:', error);
+      console.error("Error generating bot response:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   };
-
 
   return (
     <div className="relative min-h-screen overflow-hidden max-w-screen bg-white dark:bg-gradient-to-br dark:from-[#0f0f0f] dark:via-[#1a1a1a] dark:to-[#000000]">
