@@ -25,13 +25,8 @@ const AIChatBot = () => {
 
   const [questionCount, setQuestionCount] = useState<number>(0); // track questions
   const [isGuessing, setIsGuessing] = useState<boolean>(true); // only guess when true
-  const [hasResponded, setHasResponded] = useState<boolean>(false);//prevent rerender for the same message
 
   const generateBotResponse = async (history: ChatMessageProps[]) => {
-    if (hasResponded) return; //stop if already responded
-
-    setHasResponded(true);
-    setIsLoading(true);
     try {
       setIsLoading(true);
 
@@ -80,8 +75,8 @@ ${isGuessing ? "" : "Do NOT guess; explain or comment only. If the user ask the 
       const response: string = await aiResponseAPI(messages);
       const responseMsg: string = JSON.parse(response).response;
 
-      if(!responseMsg) throw new Error("Network Error! Pls try again later!");
-      
+      if (!responseMsg) throw new Error("Network Error! Pls try again later!");
+
       // Append bot response
       setChatHistory(prev => {
         if (prev.length === 0) return prev;
@@ -114,7 +109,7 @@ ${isGuessing ? "" : "Do NOT guess; explain or comment only. If the user ask the 
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden max-w-screen bg-white dark:bg-gradient-to-br dark:from-[#0f0f0f] dark:via-[#1a1a1a] dark:to-[#000000]">
+    <div className="relative min-h-screen overflow-hidden max-w-screen bg-white dark:bg-linear-to-br dark:from-[#0f0f0f] dark:via-[#1a1a1a] dark:to-[#000000]">
       {/* Dark mode toggle */}
       <div className="fixed top-10 right-10 z-10">
         <ThemeToggle />
@@ -184,7 +179,6 @@ ${isGuessing ? "" : "Do NOT guess; explain or comment only. If the user ask the 
           setChatHistory={setChatHistory}
           generateBotResponse={generateBotResponse}
           isLoading={isLoading}
-          hasResponded={hasResponded}
         />
       </div>
       {/* Invisible div to scroll into view */}

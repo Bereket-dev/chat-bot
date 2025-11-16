@@ -17,5 +17,4 @@ export type ChatFormProps = {
   setChatHistory: React.Dispatch<SetStateAction<ChatMessageProps[]>>;
   generateBotResponse: (history: ChatMessageProps[]) => void;
   isLoading: boolean;
-  hasResponded: boolean;
 };
