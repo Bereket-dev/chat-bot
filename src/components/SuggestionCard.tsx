@@ -1,12 +1,31 @@
 import type React from "react";
+import type { SuggestionProps } from "../types";
 
-type SuggestionProp = {
-  text: String;
-};
+const SuggestionCard: React.FC<SuggestionProps> = ({
+  text,
+  setChatHistory,
+  generateBotResponse,
+}) => {
+  const handleSuggestion = ()=>{
+    {
+        setChatHistory((history) => [...history, { role: "user", text: text }]);
+         setTimeout(() => {
+        setChatHistory((history) => {
+          const updated = [...history, { role: "model", text: "" }];
+          
+          generateBotResponse(updated);
 
-const SuggestionCard: React.FC<SuggestionProp> = ({ text }) => {
+          return updated;
+        });
+      }, 600);
+      }
+  }
+
   return (
-    <div className="h-min w-full rounded-lg border border-white bg-white/50 p-[9px] text-[#160211]">
+    <div
+      onClick={handleSuggestion}
+      className={`rounded-lg border border-white bg-white/45 p-[9px] text-[#160211] dark:bg-black/30 dark:border-white/20 dark:text-white`}
+    >
       {text}
     </div>
   );
