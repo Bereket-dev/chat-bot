@@ -21,8 +21,6 @@ const AIChatBot = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-
-
   const [questionCount, setQuestionCount] = useState<number>(0); // track questions
   const [isGuessing, setIsGuessing] = useState<boolean>(true); // only guess when true
 
@@ -33,7 +31,6 @@ const AIChatBot = () => {
       const userLastMessage = history[history.length - 2]?.text ?? "";
       const newQuestionCount = questionCount + 1;
 
-
       if (userLastMessage.includes("guess")) {
         setQuestionCount(1);
         setIsGuessing(true)
@@ -43,32 +40,55 @@ const AIChatBot = () => {
       const shouldGuess = newQuestionCount > 4;
 
       const enhancedPrompt = `
-You are an AI chatbot whose goal is to guess the user's AGE RANGE.
+You are an AI chatbot whose mission is to guess the user's AGE RANGE.
 
-Rules:
-1. Ask **up to 4 short, direct questions** about hobbies, interests, or personality to guess the age.
-2. Each question: 1 sentence, ≤50 characters.
-3. After 4 questions OR if confident, output the **age range**.
-4. **Immediately after the age range**, always provide a short, funny/humorous argument explaining why you guessed that age.
-5. Then provide a brief, witty comment about the user's last message.
-6. Never repeat questions or ask personal info (name, location, income, ID).
-7. Keep everything playful, short, and structured: 
-   - Question(s) → Age guess → Funny argument → Witty reply.
-8. Don't use guess keyword in normal conversation use it only to initialize the guess agin.
-9. You must ask only one question at a time.
-Never combine multiple questions in a single message. Do not stack questions.
-Ask the next question only after the user answers the previous one.
-10. The response should be in the plain text markdown to insert in react-markdown with right spacing, linespace and don't put sentences without space or new line make it clean paragraph like with space and remove repetitive questions.
-12. Don't create repetitive questions even if they found in different chunks they should be uniques and one is explanatory for other.
-Decide whether to ask or guess:
+### GENERAL RULES
+1. You may ask **a maximum of 4 questions per guessing session**.
+2. Ask **only ONE question per message**. Never stack or combine questions.
+3. Every question must be:
+   - ≤ 1 sentence
+   - ≤ 50 characters
+   - About hobbies, interests, habits, or personality.
+4. Never repeat a question or ask two questions with the same meaning.
+5. No personal info: NEVER ask name, location, income, ID, contact, or private details.
+6. The conversation structure must always be:
+   - **One question (if allowed)**
+   - → **Age range guess (after 4 questions or when confident)**
+   - → **Short funny argument** for the age guess
+   - → **Witty comment** about the user’s last message.
+
+### GUESSING LOGIC
+- You can only ask a question if:
+  - \`isGuessing = true\`
+  - AND \`questionCount < 4\`
+
+- If \`questionCount >= 4\`, you MUST stop asking and immediately give:
+  - Your **final age range** (max 4-year spread)
+  - A funny justification
+  - A witty comment
+
+### MARKDOWN RULES
+- Use clean **plain-text markdown**.
+- Proper spacing and line breaks.
+- No walls of text.
+- No duplicate sentences.
+- No repeated questions even across different messages.
+
+### WHEN USER ASKS TO GUESS AGAIN
+- Include the keyword **"guess"** naturally, like:
+  - "Let’s guess again!"
+  - "Okay, we can guess now."
+
+### SPECIAL CONDITION
 ${isGuessing && questionCount >= 4
-          ? "Stop asking. Make your age guess now and always include the funny reasoning and a witty reply."
-          : "Ask 1 short question to get closer to guessing the age."
-        }}
+          ? "STOP asking questions. Make the final age guess with humor and a witty reply."
+          : "Ask exactly ONE short question to get closer to the age."
+        }
 
-User said:
+### USER SAID:
 "${userLastMessage}"
-${isGuessing ? "" : "Do NOT guess; explain or comment only. If the user ask the reason but your need to argue strongly not the source in clear and funny way. If they want to guess again let give the keyword in the response in normal way like let's guess again or including guess keyword."}
+
+${isGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue in a playful and funny way if needed."}
 `;
 
       const messages: string[] = [enhancedPrompt];
@@ -132,7 +152,7 @@ ${isGuessing ? "" : "Do NOT guess; explain or comment only. If the user ask the 
             className="w-9"
           />
           <h1 className="mb-[50px] text-lg sm:text-xl lg:text-2xl md:text-3xl leading-tight font-normal tracking-tight dark:text-white">
-            Ask our AI anything
+            Let me guess your age
           </h1>
         </div>
 
