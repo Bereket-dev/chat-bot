@@ -5,8 +5,7 @@ import type { ChatFormProps } from "../types";
 const ChatForm: React.FC<ChatFormProps> = ({
   setChatHistory,
   generateBotResponse,
-  isLoading,
-  hasResponded
+  isLoading
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +22,6 @@ const ChatForm: React.FC<ChatFormProps> = ({
       if (inputRef.current) inputRef.current.value = "";
 
       isLoading = true;
-      hasResponded = false;
       //update chat history with new user message
       setChatHistory((history) => [
         ...history,
