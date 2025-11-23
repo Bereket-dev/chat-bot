@@ -23,9 +23,9 @@ app.post("/generate-response", async (req, res) => {
 
     const aiResponse = await generateResponse(messages);
 
-    res.json({ response: aiResponse });
+    res.json({response: aiResponse});
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "AI generation failed" });
+    res.status(500).json({ error: err.error || "AI generation failed" });
   }
 });

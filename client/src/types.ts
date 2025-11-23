@@ -18,3 +18,8 @@ export type ChatFormProps = {
   generateBotResponse: (history: ChatMessageProps[]) => void;
   isLoading: boolean;
 };
+
+export type ErrorAlertProps = {
+  message: string;
+  onClose: () => void;
+}
