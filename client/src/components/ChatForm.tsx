@@ -13,32 +13,29 @@ const ChatForm: React.FC<ChatFormProps> = ({
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
-  
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => 
-    {
-      e.preventDefault();
-      const userMessage = inputRef.current?.value.trim();
-      if (!userMessage) return;
-      if (inputRef.current) inputRef.current.value = "";
 
-      isLoading = true;
-      //update chat history with new user message
-      setChatHistory((history) => [
-        ...history,
-        { role: "user", text: userMessage },
-      ]);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const userMessage = inputRef.current?.value.trim();
+    if (!userMessage) return;
+    if (inputRef.current) inputRef.current.value = "";
 
-      setTimeout(() => {
-        setChatHistory((history) => {
-          const updated = [...history, { role: "model", text: "" }];
-          
-          generateBotResponse(updated);
+    // Update chat history immediately
+    let updatedHistory: any = [];
+    setChatHistory(prev => {
+      updatedHistory = [...prev, { role: "user", text: userMessage }];
+      return updatedHistory;
+    });
 
-          return updated;
-        });
-      }, 600);
-    }
-  
+
+    // Keep input focused
+    inputRef.current?.focus();
+
+    // Trigger bot response after delay
+    setTimeout(() => { if (updatedHistory.length > 0) generateBotResponse(updatedHistory) }, 600);
+  };
+
+
 
   return (
     <form

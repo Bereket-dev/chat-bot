@@ -7,6 +7,7 @@ import { useToggleObserver } from "../hooks/useToggleObserver";
 import ChatForm from "../components/ChatForm";
 import type { ChatMessageProps } from "../types";
 import MessageCard from "../components/MessageCard";
+import ErrorAlert from "../components/ErrorAlert";
 import { suggestedQueries } from "../Data/suggestions";
 import { aiResponseAPI } from "../services/aiResponse";
 
@@ -15,11 +16,12 @@ const AIChatBot = () => {
   const [chatHistory, setChatHistory] = useState<ChatMessageProps[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   // Auto scroll when new messages appear
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory]);
+  }, [chatHistory,isLoading]);
 
   const [questionCount, setQuestionCount] = useState<number>(0); // track questions
   const [isGuessing, setIsGuessing] = useState<boolean>(true); // only guess when true
@@ -28,7 +30,7 @@ const AIChatBot = () => {
     try {
       setIsLoading(true);
 
-      const userLastMessage = history[history.length - 2]?.text ?? "";
+      const userLastMessage = history[history.length - 1]?.text ?? "";
       const newQuestionCount = questionCount + 1;
 
       if (userLastMessage.includes("guess")) {
@@ -92,23 +94,18 @@ ${isGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue in a play
 `;
 
       const messages: string[] = [enhancedPrompt];
-      const response: string = await aiResponseAPI(messages);
-      const responseMsg: string = JSON.parse(response).response;
+      const result = await aiResponseAPI(messages);
+      const response: string = JSON.parse(result).response;
+      const responseObj = JSON.parse(response);
+      if (!responseObj.success) {
+        throw new Error('Something went wrong! Pls try again later!');
+      }
 
+      const responseMsg: string = responseObj.message;
       if (!responseMsg) throw new Error("Network Error! Pls try again later!");
 
       // Append bot response
-      setChatHistory(prev => {
-        if (prev.length === 0) return prev;
-
-        const updated = [...prev];
-        const last = updated[updated.length - 1];
-        updated[updated.length - 1] = {
-          ...last,
-          text: (last.text ?? "") + " " + responseMsg
-        };
-        return updated;
-      });
+      setChatHistory(prev => [...prev, { role: "model", text: responseMsg }]);
 
       if (responseMsg.includes("Age Range:") || responseMsg.match(/\d{1,2}-\d{1,2}/)) {
         setIsGuessing(false);
@@ -120,13 +117,21 @@ ${isGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue in a play
       if (!shouldGuess) {
         setQuestionCount(newQuestionCount);
       }
+    } catch (error: any) {
 
-    } catch (error) {
-      console.error("Error generating bot response:", error);
+      const msg = error?.error ||
+        "Something went wrong! Try again.";
+
+      setErrorMsg(msg);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (errorMsg)
+      setTimeout(() => setErrorMsg(null), 3000)
+  }, [setErrorMsg, errorMsg])
 
   return (
     <div className="relative min-h-screen overflow-hidden max-w-screen bg-white dark:bg-linear-to-br dark:from-[#0f0f0f] dark:via-[#1a1a1a] dark:to-[#000000]">
@@ -156,6 +161,8 @@ ${isGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue in a play
           </h1>
         </div>
 
+        {/* Error message */}
+        {errorMsg && <ErrorAlert message={errorMsg} onClose={() => setErrorMsg(null)} />}
         <div className="w-full">
           {chatHistory.length > 0 ? (
             <div className="flex flex-col space-y-3">
@@ -168,7 +175,8 @@ ${isGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue in a play
                   <MessageCard text={chat.text} role={chat.role} />
                 </div>
               ))}
-            </div>
+              {isLoading && <MessageCard text={'...'} role={'model'} />
+              }            </div>
           ) : (
             <>
               {suggestedQueries.length > 0 && (

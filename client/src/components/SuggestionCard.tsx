@@ -6,19 +6,17 @@ const SuggestionCard: React.FC<SuggestionProps> = ({
   setChatHistory,
   generateBotResponse,
 }) => {
-  const handleSuggestion = ()=>{
+  const handleSuggestion = () => {
     {
-        setChatHistory((history) => [...history, { role: "user", text: text }]);
-         setTimeout(() => {
-        setChatHistory((history) => {
-          const updated = [...history, { role: "model", text: "" }];
-          
-          generateBotResponse(updated);
+      // Update chat history immediately
+      let updatedHistory: any = [];
+      setChatHistory(prev => {
+        updatedHistory = [...prev, { role: "user", text: text }];
+        return updatedHistory;
+      });
 
-          return updated;
-        });
-      }, 600);
-      }
+      setTimeout(() => { if (updatedHistory.length > 0) generateBotResponse(updatedHistory) }, 600);
+    }
   }
 
   return (

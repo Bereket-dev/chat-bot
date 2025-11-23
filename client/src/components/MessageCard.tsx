@@ -5,7 +5,7 @@ import LogoBlack from "../assets/Logo_black.svg";
 import ReactMarkdown from 'react-markdown'
 const MessageCard: React.FC<ChatMessageProps> = ({ text, role }) => {
   const isModel = role === "model";
-  const isLoading = text === "";
+  const isLoading = text === "...";
 
   return (
     <div className="w-fit max-w-[85%] sm:max-w-[70%] md:max-w-[65%]">
@@ -35,7 +35,7 @@ const MessageCard: React.FC<ChatMessageProps> = ({ text, role }) => {
             />
           </div>
         )}
-        <div className="prose prose-sm dark:prose-invert max-w-none break-words">
+        <div className="prose prose-sm dark:prose-invert max-w-none wrap-break-word">
           <ReactMarkdown>{text}</ReactMarkdown>
         </div>
       </div>
