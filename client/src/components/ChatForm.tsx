@@ -16,23 +16,21 @@ const ChatForm: React.FC<ChatFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isLoading) return;
     const userMessage = inputRef.current?.value.trim();
     if (!userMessage) return;
     if (inputRef.current) inputRef.current.value = "";
 
-    // Update chat history immediately
-    let updatedHistory: any = [];
+    const userEntry = { role: "user" as const, text: userMessage };
     setChatHistory(prev => {
-      updatedHistory = [...prev, { role: "user", text: userMessage }];
+      const updatedHistory = [...prev, userEntry];
+      queueMicrotask(() => generateBotResponse(updatedHistory));
       return updatedHistory;
     });
 
 
     // Keep input focused
     inputRef.current?.focus();
-
-    // Trigger bot response after delay
-    setTimeout(() => { if (updatedHistory.length > 0) generateBotResponse(updatedHistory) }, 600);
   };
 
 
@@ -45,9 +43,9 @@ const ChatForm: React.FC<ChatFormProps> = ({
       <input
         type="text"
         ref={inputRef}
-        className="w-full text-[14px] leading-tight font-normal tracking-tight text-black  dark:text-white outline-none placeholder:text-[#A0AEC0]"
+        className="w-full text-[14px] leading-tight font-normal tracking-tight text-black dark:text-white outline-none placeholder:text-[#A0AEC0]"
         placeholder="Ask me anything!"
-
+        disabled={isLoading}
       />
       <button type="submit" disabled={isLoading}>
         <img src={Send} alt="Send Icon" className="sm:w-7 w-5 md:w-9" />

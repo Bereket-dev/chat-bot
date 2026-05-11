@@ -7,22 +7,23 @@ const SuggestionCard: React.FC<SuggestionProps> = ({
   generateBotResponse,
 }) => {
   const handleSuggestion = () => {
-    {
-      // Update chat history immediately
-      let updatedHistory: any = [];
-      setChatHistory(prev => {
-        updatedHistory = [...prev, { role: "user", text: text }];
-        return updatedHistory;
-      });
-
-      setTimeout(() => { if (updatedHistory.length > 0) generateBotResponse(updatedHistory) }, 600);
-    }
-  }
+    const userEntry = { role: "user" as const, text };
+    setChatHistory(prev => {
+      const updatedHistory = [...prev, userEntry];
+      queueMicrotask(() => generateBotResponse(updatedHistory));
+      return updatedHistory;
+    });
+  };
 
   return (
     <div
       onClick={handleSuggestion}
-      className={`rounded-lg border border-white bg-white/45 p-[9px] text-[#160211] dark:bg-black/30 dark:border-white/20 dark:text-white`}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === "Enter" || e.key === " ") handleSuggestion();
+      }}
+      className="cursor-pointer rounded-2xl border border-[#160211]/10 bg-white/70 p-3 text-sm text-[#160211] shadow-sm transition hover:bg-white/90 dark:border-white/10 dark:bg-black/20 dark:text-white dark:hover:bg-black/30"
     >
       {text}
     </div>

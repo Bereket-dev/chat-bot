@@ -1,5 +1,7 @@
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-import axios  from 'axios'; 
+import axios from "axios";
+
+const SERVER_URL =
+  import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:5000";
 
 export const aiResponseAPI = async (messages:string[]) => {
  try {
@@ -11,6 +13,6 @@ export const aiResponseAPI = async (messages:string[]) => {
     return response.data;
  } catch (error) {
     console.error('AI Response Error: ',error);
-    throw Error;
+    throw error;
  } 
 }

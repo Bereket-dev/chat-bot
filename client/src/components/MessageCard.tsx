@@ -2,7 +2,7 @@ import type React from "react";
 import type { ChatMessageProps } from "../types";
 import LogoWhite from "../assets/Logo_white.svg";
 import LogoBlack from "../assets/Logo_black.svg";
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from "react-markdown";
 const MessageCard: React.FC<ChatMessageProps> = ({ text, role }) => {
   const isModel = role === "model";
   const isLoading = text === "...";
@@ -10,15 +10,25 @@ const MessageCard: React.FC<ChatMessageProps> = ({ text, role }) => {
   return (
     <div className="w-fit max-w-[85%] sm:max-w-[70%] md:max-w-[65%]">
       {/* Role label */}
-      <h3 className={`ms-1 mb-1 text-[14px] leading-tight font-light tracking-tight dark:text-white ${isModel ? 'text-start min-w-[200px] md:min-w-[200px]' : 'text-end'}`}>
+      <h3
+        className={`ms-1 mb-1 text-[12px] leading-tight font-light tracking-tight ${
+          isModel
+            ? "text-start text-[#160211]/70 dark:text-white/70"
+            : "text-end text-[#160211]/60 dark:text-white/60"
+        }`}
+      >
         {isModel ? "Our AI" : "Me"}
       </h3>
 
       {/* Message bubble */}
       <div
-        className={`flex items-center gap-3 rounded-lg border border-white  p-3 text-[#160211] dark:text-white
-          ${isModel ? "bg-white/95 dark:bg-gray-300/10 rounded-tl-sm  text-start dark:border-none" : "bg-white/45 dark:bg-black/30  text-end dark:border-white/20 rounded-tr-sm"} 
-          ${isLoading && "animate-pulse"}
+        className={`flex items-center gap-3 rounded-2xl border p-3 text-[#160211] shadow-sm dark:text-white
+          ${
+            isModel
+              ? "bg-white/95 text-start border-[#160211]/10 dark:bg-white/10 dark:border-white/10 rounded-tl-sm"
+              : "bg-[#160211]/5 text-end border-[#160211]/10 dark:bg-black/30 dark:border-white/15 rounded-tr-sm"
+          } 
+          ${isLoading ? "animate-pulse" : ""}
          text-sm md:text-base`}
       >
         {isModel && isLoading && (
@@ -35,7 +45,7 @@ const MessageCard: React.FC<ChatMessageProps> = ({ text, role }) => {
             />
           </div>
         )}
-        <div className="prose prose-sm dark:prose-invert max-w-none wrap-break-word">
+        <div className="prose prose-sm dark:prose-invert max-w-none break-words">
           <ReactMarkdown>{text}</ReactMarkdown>
         </div>
       </div>
