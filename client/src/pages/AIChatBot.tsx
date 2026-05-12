@@ -167,7 +167,7 @@ ${effectiveIsGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue 
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden max-w-screen bg-white dark:bg-linear-to-br dark:from-[#0f0f0f] dark:via-[#1a1a1a] dark:to-[#000000]">
+    <div className="relative min-h-screen overflow-hidden max-w-screen bg-linear-to-br from-[#f6f8ff] via-white to-[#fff4fb] text-[#160211] dark:bg-linear-to-br dark:from-[#0f0f0f] dark:via-[#1a1a1a] dark:to-[#000000] dark:text-white">
       {/* Dark mode toggle */}
       <div className="fixed top-10 right-10 z-10">
         <ThemeToggle />
@@ -175,14 +175,16 @@ ${effectiveIsGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue 
 
       {/* Main glowing gradient */}
       <div className="pointer-events-none fixed inset-0">
-        <div className="fixed -bottom-30 left-[44%] h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-[#FF86E1] dark:bg-black blur-[200px] md:h-[414px] md:w-[414px]"></div>
+        <div className="fixed -bottom-30 left-[44%] h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-[#FF86E1]/35 dark:bg-black blur-[200px] md:h-[414px] md:w-[414px]"></div>
 
-        <div className="fixed bottom-30 left-[50%] h-[200px] w-[200px] rounded-full bg-[#89BCFF] dark:bg-black blur-[200px] md:h-[280px] md:w-[280px]"></div>
+        <div className="fixed bottom-30 left-[50%] h-[200px] w-[200px] rounded-full bg-[#89BCFF]/40 dark:bg-black blur-[200px] md:h-[280px] md:w-[280px]"></div>
+
+        <div className="fixed top-[-120px] left-[10%] h-[260px] w-[260px] rounded-full bg-[#B7F4D8]/35 dark:bg-black blur-[220px] md:h-[340px] md:w-[340px]"></div>
       </div>
 
       <div className="relative flex flex-col items-center min-h-screen w-[92vw] max-w-[900px] mx-auto px-4 sm:px-8 pb-32">
         {/* Your Chatbot content */}
-        <div className="mx-auto mt-16 flex flex-col items-center gap-6 text-black">
+        <div className="mx-auto mt-16 flex flex-col items-center gap-6">
           <img
             src={isDark ? LogoWhite : LogoBlack}
             alt="AI icon"
