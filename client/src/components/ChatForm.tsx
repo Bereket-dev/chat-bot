@@ -38,12 +38,12 @@ const ChatForm: React.FC<ChatFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex h-10 sm:h-12 md:h-14 w-full items-center dark:border-white/20 justify-between rounded-2xl dark:shadow-gray-900/20 dark:shadow-sm border border-[#160211]/30 bg-white p-[9px] transition-shadow duration-100 ease-in-out focus-within:shadow-lg dark:bg-black"
+      className="flex h-10 w-full items-center justify-between rounded-2xl border border-[#160211]/15 bg-white/80 p-[9px] shadow-sm backdrop-blur-md transition-shadow duration-100 ease-in-out focus-within:shadow-lg sm:h-12 md:h-14 dark:border-white/15 dark:bg-black/35 dark:shadow-gray-900/20"
     >
       <input
         type="text"
         ref={inputRef}
-        className="w-full text-[14px] leading-tight font-normal tracking-tight text-black dark:text-white outline-none placeholder:text-[#A0AEC0]"
+        className="w-full text-[14px] leading-tight font-normal tracking-tight text-black outline-none placeholder:text-[#56637E]/60 dark:text-white dark:placeholder:text-white/45"
         placeholder="Ask me anything!"
         disabled={isLoading}
       />
