@@ -38,6 +38,19 @@ const AIChatBot = () => {
     setIsGuessing(next);
   };
 
+  const countQuestionMarks = (text: string) => (text.match(/\?/g) || []).length;
+
+  const extractFirstQuestion = (text: string): string => {
+    // Extract everything up to and including the first question mark only
+    const firstQuestionIdx = text.indexOf('?');
+    if (firstQuestionIdx === -1) {
+      // No question found, return original text
+      return text;
+    }
+    // Return text up to and including the first '?'
+    return text.substring(0, firstQuestionIdx + 1).trim();
+  };
+
   const generateBotResponse = async (history: ChatMessageProps[]) => {
     try {
       setIsLoading(true);
@@ -59,9 +72,12 @@ const AIChatBot = () => {
       const enhancedPrompt = `
 You are an AI chatbot whose mission is to guess the user's AGE RANGE.
 
+### CRITICAL RULE
+**Ask ONLY ONE question per response. NEVER ask two or more questions. If you ask a question, it must be the only question in your entire response.**
+
 ### GENERAL RULES
 1. You may ask **a maximum of 4 questions per guessing session**.
-2. Ask **only ONE question per message**. Never stack or combine questions.
+2. Ask **only ONE question per message**. Never stack, combine, or list multiple questions.
 3. Every question must be:
    - ≤ 1 sentence
    - ≤ 50 characters
@@ -69,8 +85,8 @@ You are an AI chatbot whose mission is to guess the user's AGE RANGE.
 4. Never repeat a question or ask two questions with the same meaning.
 5. No personal info: NEVER ask name, location, income, ID, contact, or private details.
 6. The conversation structure must always be:
-   - **One question (if allowed)**
-   - → **Age range guess (after 4 questions or when confident)**
+   - **One question only (if allowed)** — nothing else
+   - → **Age range guess (after 4 questions or when confident)** — do NOT ask a question here
    - → **Short funny argument** for the age guess
    - → **Witty comment** about the user’s last message.
 
@@ -90,6 +106,8 @@ You are an AI chatbot whose mission is to guess the user's AGE RANGE.
 - No walls of text.
 - No duplicate sentences.
 - No repeated questions even across different messages.
+- If you ask a question, use exactly one question mark. Do not include more than one '?' in your response.
+- Do not ask multiple questions disguised as a list or bullet points.
 
 ### WHEN USER ASKS TO GUESS AGAIN
 - Include the keyword **"guess"** naturally, like:
@@ -98,8 +116,8 @@ You are an AI chatbot whose mission is to guess the user's AGE RANGE.
 
 ### SPECIAL CONDITION
 ${canAskQuestion
-          ? "Ask exactly ONE short question to get closer to the age."
-          : "STOP asking questions. Make the final age guess with humor and a witty reply."
+          ? "Ask exactly ONE short question and NOTHING ELSE. Do not add commentary, a follow-up, or another question. Just ask one question."
+          : "STOP asking questions. Make the final age guess with humor and a witty reply. Do NOT ask any questions."
         }
 
 ### UI CONTEXT
@@ -113,10 +131,7 @@ ${effectiveIsGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue 
 `;
 
       const messages: string[] = [enhancedPrompt];
-      const result = await aiResponseAPI(messages);
-      const parsedOuter = typeof result === "string" ? JSON.parse(result) : result;
-      const response: string = parsedOuter.response;
-      const responseObj = JSON.parse(response);
+      const responseObj = await aiResponseAPI(messages);
       if (!responseObj.success) {
         throw new Error(
           responseObj.error || "Something went wrong! Pls try again later!"
@@ -126,12 +141,19 @@ ${effectiveIsGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue 
       const responseMsg: string = responseObj.message;
       if (!responseMsg) throw new Error("Network Error! Pls try again later!");
 
-      // Append bot response
-      setChatHistory(prev => [...prev, { role: "model", text: responseMsg }]);
-
+      const questionMarks = countQuestionMarks(responseMsg);
       const containsAgeGuess =
         /Age Range:/i.test(responseMsg) || /\b\d{1,2}\s*-\s*\d{1,2}\b/.test(responseMsg);
-      const containsQuestion = /\?/.test(responseMsg);
+      const containsQuestion = questionMarks > 0;
+
+      // If multiple questions detected during guessing phase, extract only the first question
+      let finalResponseMsg = responseMsg;
+      if (containsQuestion && !containsAgeGuess && questionMarks > 1 && isGuessingRef.current) {
+        finalResponseMsg = extractFirstQuestion(responseMsg);
+      }
+
+      // Append bot response
+      setChatHistory(prev => [...prev, { role: "model", text: finalResponseMsg }]);
 
       if (containsAgeGuess) {
         setIsGuessingSafe(false);
@@ -215,11 +237,10 @@ ${effectiveIsGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue 
                   {[0, 1, 2, 3].map(i => (
                     <span
                       key={i}
-                      className={`h-2 w-2 rounded-full ${
-                        isGuessing && i < questionCount
-                          ? "bg-[#160211] dark:bg-white"
-                          : "bg-[#160211]/15 dark:bg-white/20"
-                      }`}
+                      className={`h-2 w-2 rounded-full ${isGuessing && i < questionCount
+                        ? "bg-[#160211] dark:bg-white"
+                        : "bg-[#160211]/15 dark:bg-white/20"
+                        }`}
                     />
                   ))}
                 </div>
@@ -239,9 +260,8 @@ ${effectiveIsGuessing ? "" : "Do NOT guess now. Only explain, comment, or argue 
                   {chatHistory.map((chat, index) => (
                     <div
                       key={index}
-                      className={`flex ${
-                        chat.role === "model" ? "justify-start" : "justify-end"
-                      }`}
+                      className={`flex ${chat.role === "model" ? "justify-start" : "justify-end"
+                        }`}
                     >
                       <MessageCard text={chat.text} role={chat.role} />
                     </div>

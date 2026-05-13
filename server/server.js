@@ -22,8 +22,7 @@ app.post("/generate-response", async (req, res) => {
       return res.status(400).json({ error: "No message provided" });
 
     const aiResponse = await generateResponse(messages);
-
-    res.json({response: aiResponse});
+    return res.json(aiResponse);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.error || "AI generation failed" });

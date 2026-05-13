@@ -32,10 +32,10 @@ const generateResponse = async (messages, retriesLeft = 3) => {
       throw new Error("No response found!");
     }
 
-    return JSON.stringify({
+    return {
       success: true,
       message: responseText,
-    });
+    };
   } catch (error) {
     const status = error?.response?.status;
     const code = error?.response?.data?.error?.code || "UNKNOWN";
@@ -62,10 +62,10 @@ const generateResponse = async (messages, retriesLeft = 3) => {
 
     console.log("Error message: ", message);
     // Return error in consistent structure
-    return JSON.stringify({
+    return {
       success: false,
       error: message,
-    });
+    };
   }
 };
 
